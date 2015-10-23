@@ -31,17 +31,19 @@ ansible-playbook --inventory-file=hosts.ini drupalize.yml --extra-vars "domain= 
 Variables
 
 ```
-_domain_ - enter your domain 
-_drupalver_ - enter drupal version number ( i.e. 7.41 )
-_dbrootpass_ - enter password for user called superuser (aka root)
-_dbuser_ - enter drupal user name
-_dbpass_ - enter drupal user password
-_dbname_ - enter drupal database name
+domain - enter your domain 
+drupalver - enter drupal version number ( i.e. 7.41 )
+dbrootpass - enter password for user called superuser (aka root)
+dbuser - enter drupal user name
+dbpass - enter drupal user password
+dbname - enter drupal database name
 ```
+
+Drupal is installed in /srv/www/yourdomain.com/htdocs
 
 Go to http://yourdomain.com/
 
-Log in with user _admin_ and password _admin_.
+Log in with user *admin* and password *admin*.
 
 ### TO-DO
 
