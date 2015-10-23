@@ -51,6 +51,41 @@ Go to http://yourdomain.com/
 
 Log in with user *admin* and password *admin*.
 
+#### Manually enable memcache module for drupal
+
+Download memcache module:
+
+```
+cd /srv/www/yourdomain.com/htdocs
+drush dl memcache -y
+```
+
+Edit drupal settings to use memcache module:
+
+```
+vim /srv/www/yourdomain.com/htdocs/sites/default/settings.php
+```
+
+Add following:
+
+```
+$conf['cache_backends'][] = 'sites/all/modules/memcache/memcache.inc';
+$conf['cache_default_class'] = 'MemCacheDrupal';
+$conf['cache_class_cache_form'] = 'DrupalDatabaseCache';
+```
+
+Enable memcache module:
+
+```
+cd /srv/www/yourdomain.com/htdocs
+drush en memcache_admin memcache -y
+```
+
+Check it:
+
+http://yourdomain.com/admin/reports/memcache
+
+
 ### TO-DO
 
 * download and enable memcache module
