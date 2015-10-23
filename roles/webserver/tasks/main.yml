@@ -85,7 +85,7 @@
     creates: /usr/local/src/drush
 
 - name: install drupal
-  shell: cd /srv/www/{{ domain }}/htdocs; drush si standard --db-url=mysql://{{ dbuser }}:{{ dbpass }}@localhost:3306/{{ dbname }} --db-su=interglider --db-su-pw=kahT9doh4Meehah5oare --account-name=admin --account-pass=admin --site-name="{{ domain }}" -y
+  shell: cd /srv/www/{{ domain }}/htdocs; drush si standard --db-url=mysql://{{ dbuser }}:{{ dbpass }}@localhost:3306/{{ dbname }} --account-name=admin --account-pass=admin --site-name="{{ domain }}" -y
 
 - name: download and enable ckeditor and bootstrap theme for drupal
   shell: cd /srv/www/{{ domain }}/htdocs; drush dl bootstrap ckeditor -y; drush en bootstrap ckeditor -y; drush vset theme_default bootstrap
