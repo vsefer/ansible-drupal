@@ -16,6 +16,12 @@ include:
 
 ### Usage
 
+Clone repo from github
+
+```
+git clone git@github.com:vsefer/ansible-drupal.git
+```
+
 Run playbook without inventory file
 
 ```
