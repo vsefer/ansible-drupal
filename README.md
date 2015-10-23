@@ -8,7 +8,7 @@ include:
 * firewall (iptables - ports 22,80,443 are opened)
 * nginx
 * php5-fpm
-* mariadb (myslq)
+* mariadb (mysql)
 * memcache
 * drupal (with bootstrap theme and ckeditor enabled)
 * drush
