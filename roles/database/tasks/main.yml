@@ -1,0 +1,27 @@
+---
+- name: install python-software-properties package
+  apt: name=python-software-properties state=present
+
+- name: install python mysql package
+  apt: name=python-mysqldb state=present
+
+- name: add apt gpg signing key
+  shell: apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0xcbcb082a1bb943db
+
+- name: add apt repository
+  apt_repository: repo='deb http://mirror3.layerjet.com/mariadb/repo/5.5/debian wheezy main' state=present update_cache=yes
+
+- name: install mariadb server package
+  apt: name=mariadb-server state=present
+
+- name: start mysql service
+  service: name=mysql state=started enabled=true
+
+- name: create a new database
+  mysql_db: name={{ dbname }} state=present collation=utf8_general_ci
+
+- name: create a database superuser aka root
+  mysql_user: name=superuser password={{ dbrootpass }} priv=*.*:ALL host=localhost state=present
+
+- name: create a database and user
+  mysql_user: name={{ dbuser }} password={{ dbpass }} priv={{ dbname }}.*:ALL host=localhost state=present

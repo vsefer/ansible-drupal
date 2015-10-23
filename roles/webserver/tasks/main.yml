@@ -1,0 +1,100 @@
+---
+- name: install nginx
+  apt: name=nginx update_cache=yes cache_valid_time=3600 state=present
+
+- name: install PHP module for nginx
+  apt: name={{ item }} update_cache=yes cache_valid_time=3600 state=present
+  with_items:
+  - php5-cli
+  - php5-mysql
+  - php5-fpm 
+  - php5-cgi 
+  - php5-gd 
+  - php5-dev 
+  - php-pear
+  - libpcre3-dev
+
+- name: start nginx
+  service: name=nginx state=running enabled=yes
+
+- name: start php5-fpm
+  service: name=php5-fpm state=running enabled=yes
+
+- name: fix cgi-pathinfo
+  replace: dest=/etc/php5/fpm/php.ini regexp='^;cgi.fix_pathinfo=1' replace='cgi.fix_pathinfo=0'
+
+- name: set php max mem size
+  replace: dest=/etc/php5/fpm/php.ini regexp='^memory_limit = 128M' replace='memory_limit = 512M'
+
+- name: set php date/timezone
+  replace: dest=/etc/php5/fpm/php.ini regexp='^;date.timezone =' replace='date.timezone = Europe/Zagreb'
+
+- name: restart php5-fpm service
+  service: name=php5-fpm state=restarted
+
+- name: copy ngnix vhost template
+  copy: src=example.com dest=/etc/nginx/sites-available/{{ domain }} owner=www-data group=www-data mode=644
+
+- name: fix domain
+  replace: dest=/etc/nginx/sites-available/{{ domain }} regexp='server_name example.com www.example.com;' replace='server_name {{ domain }} www.{{ domain }};'
+
+- name: fix domain www root path
+  replace: dest=/etc/nginx/sites-available/{{ domain }} regexp='root /var/www/html;' replace='root /srv/www/{{ domain }}/htdocs;'
+
+- name: enable {{ domain }} vhost
+  shell: cd /etc/nginx/sites-enabled; ln -s ../sites-available/{{ domain }}
+  args: 
+    creates: /etc/nginx/sites-enabled/{{ domain }}
+
+- name: remove default nginx vhost
+  shell: rm /etc/nginx/sites-enabled/default
+  args:
+    removes: /etc/nginx/sites-enabled/default
+
+- name: download drupal core
+  shell: wget http://ftp.drupal.org/files/projects/drupal-{{ drupalver }}.tar.gz -O /tmp/drupal.tar.gz
+
+- name: create www root
+  shell: mkdir -p /srv/www/{{ domain }}
+  args: 
+    creates: /srv/www/{{ domain }}
+
+- name: extract drupal core to /srv/www root
+  shell: tar -xzf /tmp/drupal.tar.gz -C /srv/www/
+
+- name: move drupal core to site /srv/www/{{ domain }}/htdocs
+  shell: mv /srv/www/drupal-{{ drupalver }} /srv/www/{{ domain }}/htdocs
+
+- name: fix drupal permissions
+  shell: chown root.www-data /srv/www/{{ domain }}/htdocs -R
+
+- name: fix drupal permissions
+  shell: chmod -R 640 /srv/www/{{ domain }}/htdocs
+
+- name: fix drupal permissions
+  shell: find /srv/www/{{ domain }}/htdocs -type d -exec chmod 750 {} \;
+
+- name: install composer
+  shell: curl -sS https://getcomposer.org/installer | php; mv composer.phar /usr/local/bin/composer; ln -s /usr/local/bin/composer /usr/bin/composer
+  args: 
+    creates: /usr/bin/composer
+
+- name: install drush
+  shell: git clone https://github.com/drush-ops/drush.git /usr/local/src/drush; cd /usr/local/src/drush; ln -s /usr/local/src/drush/drush /usr/bin/drush; composer install
+  args:
+    creates: /usr/local/src/drush
+
+- name: install drupal
+  shell: cd /srv/www/{{ domain }}/htdocs; drush si standard --db-url=mysql://{{ dbuser }}:{{ dbpass }}@localhost:3306/{{ dbname }} --db-su=interglider --db-su-pw=kahT9doh4Meehah5oare --account-name=admin --account-pass=admin --site-name="{{ domain }}" -y
+
+- name: download and enable ckeditor and bootstrap theme for drupal
+  shell: cd /srv/www/{{ domain }}/htdocs; drush dl bootstrap ckeditor -y; drush en bootstrap ckeditor -y; drush vset theme_default bootstrap
+
+- name: fix drupal permissions
+  shell: chmod -R 770 /srv/www/{{ domain }}/htdocs/sites/default/files
+
+- name: fix drupal permissions
+  shell: chown -R root.www-data /srv/www/{{ domain }}/htdocs/sites/default/files
+
+- name: restart nginx service
+  service: name=nginx state=restarted

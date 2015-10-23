@@ -1,0 +1,39 @@
+---
+- name: install essential packages
+  apt: name={{ item }} state=latest
+  with_items:
+    - atop
+    - htop
+    - mc
+    - vim-nox
+    - ferm
+    - screen
+    - links
+    - bind9-host
+    - mtr-tiny
+    - tcpdump
+    - sudo
+    - bzip2
+    - less
+    - bc
+    - nmap
+    - fail2ban
+    - curl
+    - git
+
+- name: copy ferm config template
+  copy: src=ferm.conf dest=/etc/ferm/ferm.conf owner=root group=root mode=644 backup=yes
+
+- name: copy bashrc config template
+  copy: src=bashrc.conf dest=/root/.bashrc owner=root group=root mode=644 backup=yes
+
+- name: restart ferm service
+  service: name=ferm state=restarted
+
+- name: purge old keys
+  authorized_key: user=root key="{{ item }}" state=absent
+  with_items: keys_remove
+
+- name: ensure admin ssh keys are present
+  authorized_key: user=root key="{{ item }}"
+  with_items: keys_add

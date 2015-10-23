@@ -1,0 +1,17 @@
+---
+- name: install memcache
+  apt: name={{ item }} update_cache=yes cache_valid_time=3600 state=present
+  with_items:
+  - memcached 
+  - libmemcached-tools 
+  - memstat 
+  - php5-memcached
+
+- name: set memcache mem size to 1gb
+  replace: dest=/etc/memcached.conf regexp='^-m 64' replace='-m 256'
+
+- name: restart memcache service
+  service: name=memcached state=restarted
+
+- name: restart php5-fpm service
+  service: name=php5-fpm state=restarted

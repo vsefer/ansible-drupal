@@ -1,0 +1,15 @@
+---
+- hosts: all
+  user: root
+  vars:
+    keys_add:
+    - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCzWm9ar user@machine
+    # vsefer
+    keys_remove:
+    #- ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCzWm9ar user@machine
+    # vsefer
+  roles:
+    - essential
+    - database
+    - webserver
+    - memcache
