@@ -40,8 +40,8 @@ Variables
 domain - enter your domain 
 drupalver - enter drupal version number ( i.e. 7.41 )
 dbrootpass - enter password for user called superuser (aka root)
-dbuser - enter drupal user name
-dbpass - enter drupal user password
+dbuser - enter drupal database user name
+dbpass - enter drupal database user password
 dbname - enter drupal database name
 ```
 
